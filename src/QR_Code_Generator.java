@@ -106,13 +106,6 @@ public class QR_Code_Generator {
 	}
 	
 	public String text ="";
-//	private void addText(String message) {
-//		text+=message;
-//	}
-//	private String ToString(int textLenght) {
-//		if(textLenght<10) return "0".concat(String.valueOf(textLenght));
-//		return String.valueOf(textLenght);
-//	}
 	
 	int btnid=0;
 	Dataset dataset = new Dataset();
@@ -156,9 +149,6 @@ public class QR_Code_Generator {
                 terminals[i] = reString(data[8], 0, 26);
                 data1[i] = dataset.dataset(AID[i],billID[i],refer1[i],refer2[i],transcode[i], 
                 		amounts[i],countrys[i],Merchants[i],terminals[i]);
-                
-                
-//                System.out.println("CRC : "+);
                 System.out.println("data"+i+" :"+data1[i]);
                 i++;
             }
@@ -330,17 +320,17 @@ public class QR_Code_Generator {
 		merchantName.setBounds(223, 190, 397, 45);
 		frame.getContentPane().add(merchantName);
 		
-		/*JButton btnSave = new JButton("Get Data");
-		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				text = data1[btnid];
-				generateQR(text);
-				img.setIcon(new ImageIcon("C:\\Users\\BenzRST\\workspace\\QRMaker\\QR.png"));
-			}
-		});
-		btnSave.setFont(new Font("Monospaced", Font.PLAIN, 20));
-		btnSave.setBounds(35, 625, 900, 73);
-		frame.getContentPane().add(btnSave);*/
+//		JButton btnSave = new JButton("Get Data");
+//		btnSave.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent arg0) {
+//				text = data1[btnid];
+//				generateQR(text);
+////				img.setIcon(new ImageIcon("C:\\Users\\BenzRST\\workspace\\QRMaker\\QR.png"));
+//			}
+//		});
+//		btnSave.setFont(new Font("Monospaced", Font.PLAIN, 20));
+//		btnSave.setBounds(35, 625, 900, 73);
+//		frame.getContentPane().add(btnSave);
 		
 		JLabel lblAmount = new JLabel("Amount :");
 		lblAmount.setFont(new Font("Monospaced", Font.PLAIN, 16));
