@@ -7,9 +7,13 @@ public class Dataset {
 		addText("010212");
 		addText("3082");
 		addText(("00".concat(ToString(AID.length()))).concat(AID));
-		addText(("01".concat(ToString(billerID.length()))).concat(billerID));
+		if(billerID.length()!=0){
+			addText(("01".concat(ToString(billerID.length()))).concat(billerID));
+		}
 		addText(("02".concat(ToString(ref1.length()))).concat(ref1));
-		addText(("03".concat(ToString(ref2.length()))).concat(ref2));
+		if(ref2.length()!=0){
+			addText(("03".concat(ToString(ref2.length()))).concat(ref2));
+		}
 		addText(("53".concat(ToString(transactioncode.length()))).concat(transactioncode));
 		addText(("54".concat(ToString(amount.length()))).concat(amount));
 		addText("5802TH");
@@ -18,7 +22,7 @@ public class Dataset {
 		addText(("62".concat(ToString(terminalidData.length()))).concat(terminalidData));
 		addText("6304");
 		addText(Integer.toHexString(crc16(text.getBytes())).toUpperCase());
-
+		
 		return text;
 	}
 	private String ToString(int textLenght) {

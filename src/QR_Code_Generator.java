@@ -2,19 +2,25 @@ import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import java.awt.AlphaComposite;
+import java.awt.ComponentOrientation;
+
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JTextArea;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -29,6 +35,9 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
+import javax.swing.JFormattedTextField;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class QR_Code_Generator {
 
@@ -40,7 +49,6 @@ public class QR_Code_Generator {
 	private JTextField billerID;
 	private JTextField merchantName;
 	private JLabel lblNewLabel;
-
 	/**
 	 * Launch the application.
 	 */
@@ -68,12 +76,13 @@ public class QR_Code_Generator {
 	 * Initialize the contents of the frame.
 	 */
 	private String dir = System.getProperty("user.dir");
-	private void generateQR(String message) {
+	
+	private void generateQR(String message,int i) {
 		Map hints = new HashMap<>();
 		hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
 		QRCodeWriter writer = new QRCodeWriter();
 		BitMatrix bitMatrix = null;
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		new ByteArrayOutputStream();
 		
 		try {
 			    // Create a qr code with the url as content and a size of 250x250 px
@@ -98,14 +107,15 @@ public class QR_Code_Generator {
 			    // the same space for the logo to be centered
 			g.drawImage(logoImage, (int) Math.round(deltaWidth / 2), (int) Math.round(deltaHeight / 2), null);
 			    // Write combined image as PNG to OutputStream
-			ImageIO.write(combined, "png", new File(dir+"\\"+btnid+".png"));
-			System.out.println("done");
+			ImageIO.write(combined, "png", new File(dir+"\\"+i+".png"));
+//			System.out.println("done");
 		} catch (Exception e) {
 			System.out.println(e);
 		}  
 	}
 	
 	public String text ="";
+	int Maxbtn=10;
 	
 	int btnid=0;
 	Dataset dataset = new Dataset();
@@ -122,13 +132,59 @@ public class QR_Code_Generator {
     JLabel img = new JLabel();
     private String reString(String dat,int start,int limit) {
 		if(dat.length()>limit){
-			dat = dat.substring(start, limit);
+			dat = dat.substring(start, limit).toUpperCase();
 		}
 		return dat;
 	}
     
+    private void WriteCSV() {
+    	// The name of the file to open.
+        String fileName = "temp.csv";
+
+        try {
+            // Assume default encoding.
+            FileWriter fileWriter =
+                new FileWriter(fileName);
+
+            // Always wrap FileWriter in BufferedWriter.
+            BufferedWriter bufferedWriter =
+                new BufferedWriter(fileWriter);
+
+            // Note that write() does not automatically
+            // append a newline character.
+            bufferedWriter.write("AID,BillerID,Reference1,Reference2,TransactionCurrency,amount,Countrycode,MerchantName,TerminalID");
+//            bufferedWriter.newLine();
+            for(int i = 1;i<Maxbtn;i++){
+            	if(i == btnid){
+            		amounts[i] = amount.getText(); 
+            		billID[i] = billerID.getText();
+            		refer1[i] = ref1.getText();
+            		refer2[i] = ref2.getText();
+            		Merchants[i] = merchantName.getText();
+            		data1[i] = dataset.dataset(AID[i],billID[i],refer1[i],refer2[i],transcode[i], 
+                    		amounts[i],countrys[i],Merchants[i],terminals[i]);
+                    System.out.println("data"+i+" :"+data1[i]);
+                    generateQR(data1[i],i);
+            	}
+            	bufferedWriter.newLine();
+            	bufferedWriter.write(AID[i]+","+billID[i]+","+refer1[i]+","+refer2[i]+","+transcode[i]+","+amounts[i]+","+countrys[i]+","+Merchants[i]+","+terminals[i]);
+            }
+
+            // Always close files.
+            bufferedWriter.close();
+        }
+        catch(IOException ex) {
+            System.out.println(
+                "Error writing to file '"
+                + fileName + "'");
+            // Or we could just do this:
+            // ex.printStackTrace();
+        }
+        
+	}
+    
 	private void ReadCSV() {
-		String Filedir = dir+"/dataset1.csv";
+		String Filedir = dir+"/temp.csv";
 		BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
@@ -150,16 +206,17 @@ public class QR_Code_Generator {
                 data1[i] = dataset.dataset(AID[i],billID[i],refer1[i],refer2[i],transcode[i], 
                 		amounts[i],countrys[i],Merchants[i],terminals[i]);
                 System.out.println("data"+i+" :"+data1[i]);
+                generateQR(data1[i],i);
                 i++;
             }
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } 
 	}
-	private void show() {
+	
+	private void show(){
 		text = data1[btnid];
 		amount.setText(amounts[btnid]);
 		ref1.setText(refer1[btnid]);
@@ -167,26 +224,23 @@ public class QR_Code_Generator {
 		terminalID.setText(terminals[btnid]);
 		merchantName.setText(Merchants[btnid]);
 		billerID.setText(billID[btnid]);
-		lblNewLabel.setIcon(new ImageIcon(dir+"\\"+btnid+".png"));
+		ImageIcon imgico = new ImageIcon(dir+"\\"+btnid+".png");
+		imgico.getImage().flush();
+		lblNewLabel.setIcon(imgico);
 	}
 	private void initialize() {
 		ReadCSV();
 		frame = new JFrame();
+		frame.getContentPane().setFont(new Font("Monospaced", Font.PLAIN, 20));
 		frame.setBounds(100, 100, 1002, 768);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		lblNewLabel = new JLabel("");
-		JTextArea showArea = new JTextArea();
-		showArea.setText("text");
-		showArea.setFont(new Font("Monospaced", Font.PLAIN, 22));
-		showArea.setBounds(654, 35, 280, 45);
-		frame.getContentPane().add(showArea);
 		
 		JButton btn1 = new JButton("1");
 		btn1.setFont(new Font("Monospaced", Font.PLAIN, 20));
 		btn1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				showArea.setText("Button 1 on click");
 				btnid = 1;
 				show();
 			}
@@ -198,7 +252,6 @@ public class QR_Code_Generator {
 		btn2.setFont(new Font("Monospaced", Font.PLAIN, 20));
 		btn2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showArea.setText("Button 2 on click");
 				btnid = 2;
 				show();
 			}
@@ -210,7 +263,6 @@ public class QR_Code_Generator {
 		btn3.setFont(new Font("Monospaced", Font.PLAIN, 20));
 		btn3.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showArea.setText("Button 3 on click");
 				btnid = 3;
 				show();
 			}
@@ -222,7 +274,6 @@ public class QR_Code_Generator {
 		btn4.setFont(new Font("Monospaced", Font.PLAIN, 20));
 		btn4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showArea.setText("Button 4 on click");
 				btnid = 4;
 				show();
 			}
@@ -234,7 +285,6 @@ public class QR_Code_Generator {
 		btn5.setFont(new Font("Monospaced", Font.PLAIN, 20));
 		btn5.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showArea.setText("Button 5 on click");
 				btnid = 5;
 				show();
 			}
@@ -246,7 +296,6 @@ public class QR_Code_Generator {
 		btn6.setFont(new Font("Monospaced", Font.PLAIN, 20));
 		btn6.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showArea.setText("Button 6 on click");
 				btnid = 6;
 				show();
 			}
@@ -258,7 +307,6 @@ public class QR_Code_Generator {
 		btn7.setFont(new Font("Monospaced", Font.PLAIN, 20));
 		btn7.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showArea.setText("Button 7 on click");
 				btnid = 7;
 				show();
 			}
@@ -270,7 +318,6 @@ public class QR_Code_Generator {
 		btn8.setFont(new Font("Monospaced", Font.PLAIN, 20));
 		btn8.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showArea.setText("Button 8 on click");
 				btnid = 8;
 				show();
 			}
@@ -282,7 +329,6 @@ public class QR_Code_Generator {
 		btn9.setFont(new Font("Monospaced", Font.PLAIN, 20));
 		btn9.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				showArea.setText("Button 9 on click");
 				btnid = 9;
 				show();
 			}
@@ -291,46 +337,63 @@ public class QR_Code_Generator {
 		frame.getContentPane().add(btn9);
 		
 		amount = new JTextField();
-		amount.setBounds(140, 33, 180, 45);
+		amount.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent e) {
+				char c = e.getKeyChar();
+				if((!Character.isDigit(c)||c==KeyEvent.VK_BACK_SPACE || c == KeyEvent.VK_DELETE )&& c != '.'){
+					e.consume();
+				}
+			}
+		});
+		amount.setBounds(140, 33, 142, 45);
+		amount.setFont(new Font("Monospaced", Font.PLAIN, 16));
+		amount.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 		frame.getContentPane().add(amount);
 		amount.setColumns(10);
 		
 		ref1 = new JTextField();
 		ref1.setColumns(10);
-		ref1.setBounds(140, 115, 180, 45);
+		ref1.setFont(new Font("Monospaced", Font.PLAIN, 16));
+		ref1.setBounds(140, 94, 480, 45);
 		frame.getContentPane().add(ref1);
 		
 		ref2 = new JTextField();
 		ref2.setColumns(10);
-		ref2.setBounds(440, 115, 180, 45);
+		ref2.setFont(new Font("Monospaced", Font.PLAIN, 16));
+		ref2.setBounds(137, 152, 483, 45);
 		frame.getContentPane().add(ref2);
 		
 		terminalID = new JTextField();
 		terminalID.setColumns(10);
+		terminalID.setFont(new Font("Monospaced", Font.PLAIN, 16));
 		terminalID.setBounds(223, 268, 397, 45);
 		frame.getContentPane().add(terminalID);
 		
 		billerID = new JTextField();
 		billerID.setColumns(10);
-		billerID.setBounds(440, 34, 180, 45);
+		billerID.setFont(new Font("Monospaced", Font.PLAIN, 16));
+		billerID.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+		billerID.setBounds(407, 34, 213, 45);
 		frame.getContentPane().add(billerID);
 		
 		merchantName = new JTextField();
 		merchantName.setColumns(10);
-		merchantName.setBounds(223, 190, 397, 45);
+		merchantName.setFont(new Font("Monospaced", Font.PLAIN, 16));
+		merchantName.setBounds(223, 210, 397, 45);
 		frame.getContentPane().add(merchantName);
 		
-//		JButton btnSave = new JButton("Get Data");
-//		btnSave.addActionListener(new ActionListener() {
-//			public void actionPerformed(ActionEvent arg0) {
-//				text = data1[btnid];
-//				generateQR(text);
-////				img.setIcon(new ImageIcon("C:\\Users\\BenzRST\\workspace\\QRMaker\\QR.png"));
-//			}
-//		});
-//		btnSave.setFont(new Font("Monospaced", Font.PLAIN, 20));
-//		btnSave.setBounds(35, 625, 900, 73);
-//		frame.getContentPane().add(btnSave);
+		JButton btnSave = new JButton("Save Data");
+		btnSave.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {		
+				WriteCSV();
+				ReadCSV();
+				show();
+			}
+		});
+		btnSave.setFont(new Font("Monospaced", Font.PLAIN, 20));
+		btnSave.setBounds(35, 625, 900, 73);
+		frame.getContentPane().add(btnSave);
 		
 		JLabel lblAmount = new JLabel("Amount :");
 		lblAmount.setFont(new Font("Monospaced", Font.PLAIN, 16));
@@ -339,12 +402,12 @@ public class QR_Code_Generator {
 		
 		JLabel lblRef = new JLabel("Ref 1 :");
 		lblRef.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		lblRef.setBounds(35, 115, 90, 45);
+		lblRef.setBounds(35, 94, 90, 45);
 		frame.getContentPane().add(lblRef);
 		
 		JLabel lblRef_1 = new JLabel("Ref2 :");
 		lblRef_1.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		lblRef_1.setBounds(338, 115, 90, 45);
+		lblRef_1.setBounds(35, 152, 90, 45);
 		frame.getContentPane().add(lblRef_1);
 		
 		JLabel lblTerminalId = new JLabel("Terminal ID :");
@@ -354,17 +417,16 @@ public class QR_Code_Generator {
 		
 		JLabel lblBillerId = new JLabel("Biller ID :");
 		lblBillerId.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		lblBillerId.setBounds(338, 34, 90, 45);
+		lblBillerId.setBounds(294, 32, 110, 45);
 		frame.getContentPane().add(lblBillerId);
 		
 		JLabel lblMerchantName = new JLabel("Merchant Name :");
 		lblMerchantName.setFont(new Font("Monospaced", Font.PLAIN, 16));
-		lblMerchantName.setBounds(35, 190, 180, 45);
+		lblMerchantName.setBounds(35, 210, 180, 45);
 		frame.getContentPane().add(lblMerchantName);
 		
-		lblNewLabel.setBounds(664, 83, 250, 250);
+		lblNewLabel.setBounds(684, 62, 250, 250);
 		frame.getContentPane().add(lblNewLabel);
-		
 		
 	}
 }
