@@ -139,7 +139,7 @@ public class QR_Code_Generator {
     
     private void WriteCSV() {
     	// The name of the file to open.
-        String fileName = "temp.csv";
+        String fileName = dir+"\\temp.csv";
 
         try {
             // Assume default encoding.
@@ -378,6 +378,17 @@ public class QR_Code_Generator {
 		frame.getContentPane().add(billerID);
 		
 		merchantName = new JTextField();
+		merchantName.addKeyListener(new KeyAdapter(){
+			@Override
+			public void keyTyped(KeyEvent e) {
+				char c = e.getKeyChar();
+				if((!Character.isDigit(c)|| c == KeyEvent.VK_BACK_SPACE || c == KeyEvent.VK_DELETE) 
+						&& !Character.isUpperCase(c) 
+						&& c !=' '){
+					e.consume();
+				}
+			}
+		});
 		merchantName.setColumns(10);
 		merchantName.setFont(new Font("Monospaced", Font.PLAIN, 16));
 		merchantName.setBounds(223, 210, 397, 45);
