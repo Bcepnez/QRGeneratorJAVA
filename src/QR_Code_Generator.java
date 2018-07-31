@@ -155,19 +155,25 @@ public class QR_Code_Generator {
             bufferedWriter.write("AID,BillerID,Reference1,Reference2,TransactionCurrency,amount,Countrycode,MerchantName,TerminalID");
 //            bufferedWriter.newLine();
             for(int i = 1;i<Maxbtn;i++){
+            	bufferedWriter.newLine();
             	if(i == btnid){
+            		AID[i] = "A000000677010112";
+            		transcode[i]="764";
+            		countrys[i] = "TH";
             		amounts[i] = amount.getText(); 
             		billID[i] = billerID.getText();
             		refer1[i] = ref1.getText();
             		refer2[i] = ref2.getText();
             		Merchants[i] = merchantName.getText();
+            		terminals[i] = terminalID.getText();
             		data1[i] = dataset.dataset(AID[i],billID[i],refer1[i],refer2[i],transcode[i], 
                     		amounts[i],countrys[i],Merchants[i],terminals[i]);
                     System.out.println("data"+i+" :"+data1[i]);
                     generateQR(data1[i],i);
             	}
-            	bufferedWriter.newLine();
             	bufferedWriter.write(AID[i]+","+billID[i]+","+refer1[i]+","+refer2[i]+","+transcode[i]+","+amounts[i]+","+countrys[i]+","+Merchants[i]+","+terminals[i]);
+            	
+            	
             }
 
             // Always close files.
@@ -396,9 +402,11 @@ public class QR_Code_Generator {
 		
 		JButton btnSave = new JButton("Save Data");
 		btnSave.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {		
-				WriteCSV();
-				ReadCSV();
+			public void actionPerformed(ActionEvent arg0) {	
+				if(btnid!=0){
+					WriteCSV();
+					ReadCSV();
+				}
 				show();
 			}
 		});
