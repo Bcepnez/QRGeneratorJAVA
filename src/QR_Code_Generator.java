@@ -136,7 +136,12 @@ public class QR_Code_Generator {
 		}
 		return dat;
 	}
-    
+    private String AmountCheck(String textLenght) {
+		if(textLenght.matches("[0-9]*[.][0-9]{2}")){
+			return textLenght;
+		}
+		return textLenght+".00";
+	}
     private void WriteCSV() {
     	// The name of the file to open.
         String fileName = dir+"\\temp.csv";
@@ -160,7 +165,7 @@ public class QR_Code_Generator {
             		AID[i] = "A000000677010112";
             		transcode[i]="764";
             		countrys[i] = "TH";
-            		amounts[i] = amount.getText(); 
+            		amounts[i] = AmountCheck(amount.getText()); 
             		billID[i] = billerID.getText();
             		refer1[i] = ref1.getText();
             		refer2[i] = ref2.getText();

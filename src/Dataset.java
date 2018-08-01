@@ -15,7 +15,6 @@ public class Dataset {
 			addText(("03".concat(ToString(ref2.length()))).concat(ref2));
 		}
 		addText(("53".concat(ToString(transactioncode.length()))).concat(transactioncode));
-		amount = AmountCheck(amount);
 		addText(("54".concat(ToString(amount.length()))).concat(amount));
 		addText("5802TH");
 		addText(("59".concat(ToString(Merchant.length()))).concat(Merchant));
@@ -29,12 +28,6 @@ public class Dataset {
 	private String ToString(int textLenght) {
 		if(textLenght<10) return "0".concat(String.valueOf(textLenght));
 		return String.valueOf(textLenght);
-	}
-	private String AmountCheck(String textLenght) {
-		if(textLenght.matches("[0-9]*[.][0-9]{2}")){
-			return textLenght;
-		}
-		return textLenght+".00";
 	}
 	public String text ="";
 	private void addText(String message) {

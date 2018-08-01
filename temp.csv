@@ -1,6 +1,6 @@
 AID,BillerID,Reference1,Reference2,TransactionCurrency,amount,Countrycode,MerchantName,TerminalID
-A000000677010112,147864,43434343,4212121212,764,100,TH,BNK48,14733
-A000000677010112,123213,123123,12312,764,12312312,TH,3123,3123
+A000000677010112,147864,43434343,4212121212,764,10.00,TH,BNK48,14733
+A000000677010112,123213,123123,12312,764,1232.25,TH,3123,3123
 null,null,null,null,null,null,null,null,null
 null,null,null,null,null,null,null,null,null
 null,null,null,null,null,null,null,null,null
